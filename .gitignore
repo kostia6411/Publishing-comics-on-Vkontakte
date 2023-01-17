@@ -1,0 +1,5 @@
+.env
+.idea
+images
+__pycache__
+.idea/workspace.xml
