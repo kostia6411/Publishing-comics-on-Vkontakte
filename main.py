@@ -6,13 +6,13 @@ import requests
 from dotenv import load_dotenv
 
 
-def get_upload_link(access_token):
+def get_upload_link(access_token, group_id, user_id):
     url = "https://api.vk.com/method/photos.getWallUploadServer"
     payload = {
         "access_token": access_token,
         "v": '5.131',
-        "group_id": "217107804",
-        "user_id": "459582259"
+        "group_id": group_id,
+        "user_id": user_id
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
@@ -32,12 +32,12 @@ def publish_to_wall(access_token, media_id):
     pprint(response.json())
 
 
-def uploading_album(access_token, photo_hash, photo_photo, photo_server):
+def uploading_album(access_token, photo_hash, photo_photo, photo_server, group_id):
     url = "https://api.vk.com/method/photos.saveWallPhoto"
     payload = {
         "access_token": access_token,
         "v": '5.131',
-        "group_id": "217107804",
+        "group_id": group_id,
         "hash": photo_hash,
         "photo": photo_photo,
         "server": photo_server,
@@ -78,6 +78,8 @@ def downloading_comic(images_path):
 if __name__ == "__main__":
     load_dotenv()
     client_id = os.environ["CLIENT_ID"]
+    group_id = os.environ["GROUP_ID"]
+    user_id = os.environ["USER_ID"]
     access_token = os.environ["ACCESS_TOKEN"]
     images_path = os.getenv("IMAGES_DIR", "images")
     os.makedirs(images_path, exist_ok=True)
