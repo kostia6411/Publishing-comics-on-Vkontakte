@@ -19,17 +19,17 @@ def get_upload_link(access_token, group_id, user_id):
     return response.json()["response"]["upload_url"]
 
 
-def publish_to_wall(access_token, media_id):
+def publish_to_wall(access_token, media_id, group_id):
     url = "https://api.vk.com/method/wall.post"
     payload = {
         "access_token": access_token,
         "v": '5.131',
-        "owner_id": "-217107804",
+        "owner_id": f"-{group_id}",
         "attachments": f"photo459582259_{media_id}"
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    pprint(response.json())
+    return response.json()
 
 
 def uploading_album(access_token, photo_hash, photo_photo, photo_server, group_id):
