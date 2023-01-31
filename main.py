@@ -1,6 +1,5 @@
 import os
 import random
-from pprint import pprint
 
 import requests
 from dotenv import load_dotenv
@@ -32,7 +31,7 @@ def publish_to_wall(access_token, media_id, group_id):
     return response.json()
 
 
-def uploading_album(access_token, photo_hash, photo_photo, photo_server, group_id):
+def saves_album(access_token, photo_hash, photo_photo, photo_server, group_id):
     url = "https://api.vk.com/method/photos.saveWallPhoto"
     payload = {
         "access_token": access_token,
@@ -47,19 +46,18 @@ def uploading_album(access_token, photo_hash, photo_photo, photo_server, group_i
     return response.json()["response"][0]["id"]
 
 
-def sending_photos(upload_link):
-    url = upload_link
-    with open('images/comic.jpg', 'rb') as file:
+def upload_server_photos(upload_link, way_comic):
+    with open(way_comic, 'rb') as file:
         payload = {
             "photo": file
         }
-        response = requests.post(url, files=payload)
+        response = requests.post(upload_link, files=payload)
         response.raise_for_status()
         response_payload = response.json()
         return response_payload['hash'], response_payload['photo'], response_payload['server']
 
 
-def downloading_comic(images_path):
+def download_random_comic(images_path):
     url = "https://xkcd.com/info.0.json"
     response = requests.get(url)
     response.raise_for_status()
@@ -81,15 +79,16 @@ if __name__ == "__main__":
     group_id = os.environ["GROUP_ID"]
     user_id = os.environ["USER_ID"]
     access_token = os.environ["ACCESS_TOKEN"]
+    way_comic = os.path.join('images', 'comic.jpg')
     images_path = os.getenv("IMAGES_DIR", "images")
     os.makedirs(images_path, exist_ok=True)
     try:
-        downloading_comic(images_path)
-        upload_link = get_upload_link(access_token)
-        photo_hash, photo_photo, photo_server = sending_photos(upload_link)
-        media_id = uploading_album(access_token, photo_hash, photo_photo, photo_server)
-        publish_to_wall(access_token, media_id)
+        download_random_comic(images_path)
+        upload_link = get_upload_link(access_token, group_id, user_id)
+        photo_hash, photo_photo, photo_server = upload_server_photos(upload_link)
+        media_id = saves_album(access_token, photo_hash, photo_photo, photo_server, group_id)
+        publish_to_wall(access_token, media_id, group_id)
     except requests.exceptions.HTTPError:
         print("Ошибка при запросе")
     finally:
-        os.remove("images/comic.jpg")
+        os.remove(way_comic)
