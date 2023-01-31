@@ -5,25 +5,25 @@ import requests
 from dotenv import load_dotenv
 
 
-def get_upload_link(access_token, group_id, user_id):
+def get_upload_link(vk_access_token, vk_group_id, vk_user_id):
     url = "https://api.vk.com/method/photos.getWallUploadServer"
     payload = {
-        "access_token": access_token,
+        "access_token": vk_access_token,
         "v": '5.131',
-        "group_id": group_id,
-        "user_id": user_id
+        "group_id": vk_group_id,
+        "user_id": vk_user_id
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
     return response.json()["response"]["upload_url"]
 
 
-def publish_to_wall(access_token, media_id, group_id):
+def publish_to_wall(vk_access_token, media_id, vk_group_id):
     url = "https://api.vk.com/method/wall.post"
     payload = {
-        "access_token": access_token,
+        "access_token": vk_access_token,
         "v": '5.131',
-        "owner_id": f"-{group_id}",
+        "owner_id": f"-{vk_group_id}",
         "attachments": f"photo459582259_{media_id}"
     }
     response = requests.get(url, params=payload)
@@ -31,12 +31,12 @@ def publish_to_wall(access_token, media_id, group_id):
     return response.json()
 
 
-def saves_album(access_token, photo_hash, photo_photo, photo_server, group_id):
+def saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_id):
     url = "https://api.vk.com/method/photos.saveWallPhoto"
     payload = {
-        "access_token": access_token,
+        "access_token": vk_access_token,
         "v": '5.131',
-        "group_id": group_id,
+        "group_id": vk_group_id,
         "hash": photo_hash,
         "photo": photo_photo,
         "server": photo_server,
@@ -75,19 +75,18 @@ def download_random_comic(images_path):
 
 if __name__ == "__main__":
     load_dotenv()
-    client_id = os.environ["CLIENT_ID"]
-    group_id = os.environ["GROUP_ID"]
-    user_id = os.environ["USER_ID"]
-    access_token = os.environ["ACCESS_TOKEN"]
+    vk_group_id = os.environ["VK_GROUP_ID"]
+    vk_user_id = os.environ["VK_USER_ID"]
+    vk_access_token = os.environ["VK_ACCESS_TOKEN"]
     way_comic = os.path.join('images', 'comic.jpg')
     images_path = os.getenv("IMAGES_DIR", "images")
     os.makedirs(images_path, exist_ok=True)
     try:
         download_random_comic(images_path)
-        upload_link = get_upload_link(access_token, group_id, user_id)
+        upload_link = get_upload_link(vk_access_token, vk_group_id, vk_user_id)
         photo_hash, photo_photo, photo_server = upload_server_photos(upload_link)
-        media_id = saves_album(access_token, photo_hash, photo_photo, photo_server, group_id)
-        publish_to_wall(access_token, media_id, group_id)
+        media_id = saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_id)
+        publish_to_wall(vk_access_token, media_id, vk_group_id)
     except requests.exceptions.HTTPError:
         print("Ошибка при запросе")
     finally:
