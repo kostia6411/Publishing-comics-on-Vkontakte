@@ -4,7 +4,7 @@ Publishing-comics-on-Vkontakte - это публикация комиксов в
 
 ### Как установить
 
-Нужно создать файл .env и занести в него следующие данные: клиент ID и access токен.
+Нужно создать файл .env и занести в него следующие данные: ID группы, ID пользователя и access токен.
 
 Получить access токен нужно будет по даннной ссылке: https://oauth.vk.com/authorize?client_id=7777777&scope=photos,groups,wall,offline&display=page&response_type=token&v=5.131&state=123456 .
 
@@ -18,7 +18,6 @@ ID пользователя можно получить звйдя на стра
 
 Пример файла .env
 ```
-CLIENT_ID=[Ваш клиент ID]
 ACCESS_TOKEN=[Ваш access токен]
 GROUP_ID=[Ваш ID группы]
 USER_ID=[Ваш ID пользователя]
