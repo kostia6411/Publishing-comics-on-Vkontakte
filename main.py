@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 
@@ -15,6 +16,7 @@ def get_upload_link(vk_access_token, vk_group_id, vk_user_id):
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
+    check_vk_response(response)
     return response.json()["response"]["upload_url"]
 
 
@@ -28,6 +30,7 @@ def publish_to_wall(vk_access_token, media_id, vk_group_id):
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
+    check_vk_response(response)
     return response.json()
 
 
@@ -43,6 +46,7 @@ def saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
+    check_vk_response(response)
     return response.json()["response"][0]["id"]
 
 
@@ -53,6 +57,7 @@ def upload_server_photos(upload_link, way_comic):
         }
         response = requests.post(upload_link, files=payload)
         response.raise_for_status()
+        check_vk_response(response)
         response_payload = response.json()
         return response_payload['hash'], response_payload['photo'], response_payload['server']
 
@@ -73,6 +78,13 @@ def download_random_comic(images_path):
         file.write(random_comic.content)
     return response.json()["alt"]
 
+
+def check_vk_response(response):
+    if response.json().get('error'):
+        logging.warning(response.json())
+        raise requests.exceptions.HTTPError
+
+
 if __name__ == "__main__":
     load_dotenv()
     vk_group_id = os.environ["VK_GROUP_ID"]
@@ -88,6 +100,6 @@ if __name__ == "__main__":
         media_id = saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_id)
         publish_to_wall(vk_access_token, media_id, vk_group_id)
     except requests.exceptions.HTTPError:
-        print("Ошибка при запросе")
+        print("Ошибка при запросе к ВК")
     finally:
         os.remove(way_comic)
