@@ -50,16 +50,16 @@ def saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group
     return response.json()["response"][0]["id"]
 
 
-def upload_server_photos(upload_link, way_comic):
-    with open(way_comic, 'rb') as file:
+def upload_server_photos(upload_link, comic_path):
+    with open(comic_path, 'rb') as file:
         payload = {
             "photo": file
         }
         response = requests.post(upload_link, files=payload)
-        response.raise_for_status()
-        check_vk_response(response)
-        response_payload = response.json()
-        return response_payload['hash'], response_payload['photo'], response_payload['server']
+    response.raise_for_status()
+    check_vk_response(response)
+    response_payload = response.json()
+    return response_payload['hash'], response_payload['photo'], response_payload['server']
 
 
 def download_random_comic(images_path):
@@ -90,16 +90,16 @@ if __name__ == "__main__":
     vk_group_id = os.environ["VK_GROUP_ID"]
     vk_user_id = os.environ["VK_USER_ID"]
     vk_access_token = os.environ["VK_ACCESS_TOKEN"]
-    way_comic = os.path.join('images', 'comic.jpg')
+    comic_path = os.path.join('images', 'comic.jpg')
     images_path = os.getenv("IMAGES_DIR", "images")
     os.makedirs(images_path, exist_ok=True)
     try:
         download_random_comic(images_path)
         upload_link = get_upload_link(vk_access_token, vk_group_id, vk_user_id)
-        photo_hash, photo_photo, photo_server = upload_server_photos(upload_link)
+        photo_hash, photo_photo, photo_server = upload_server_photos(upload_link, comic_path)
         media_id = saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_id)
         publish_to_wall(vk_access_token, media_id, vk_group_id)
     except requests.exceptions.HTTPError:
         print("Ошибка при запросе к ВК")
     finally:
-        os.remove(way_comic)
+        os.remove(comic_path)
