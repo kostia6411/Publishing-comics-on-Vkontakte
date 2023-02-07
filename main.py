@@ -73,7 +73,7 @@ def download_random_comic(images_path):
     response.raise_for_status()
     random_comic = requests.get(response.json()["img"])
     random_comic.raise_for_status()
-    picture_path= os.path.join(images_path, 'comic.jpg')
+    picture_path = os.path.join(images_path, 'comic.jpg')
     with open(picture_path, 'wb') as file:
         file.write(random_comic.content)
     return response.json()["alt"]
