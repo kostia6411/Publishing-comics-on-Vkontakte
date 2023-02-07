@@ -20,13 +20,13 @@ def get_upload_link(vk_access_token, vk_group_id, vk_user_id):
     return response.json()["response"]["upload_url"]
 
 
-def publish_to_wall(vk_access_token, media_id, vk_group_id):
+def publish_to_wall(vk_access_token, media_id, vk_group_id, owner_id):
     url = "https://api.vk.com/method/wall.post"
     payload = {
         "access_token": vk_access_token,
         "v": '5.131',
         "owner_id": f"-{vk_group_id}",
-        "attachments": f"photo459582259_{media_id}"
+        "attachments": f"photo{owner_id}_{media_id}"
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
@@ -47,7 +47,7 @@ def saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group
     response = requests.get(url, params=payload)
     response.raise_for_status()
     check_vk_response(response)
-    return response.json()["response"][0]["id"]
+    return response.json()["response"][0]["id"], response.json()["response"][0]["owner_id"]
 
 
 def upload_server_photos(upload_link, comic_path):
@@ -97,8 +97,8 @@ if __name__ == "__main__":
         download_random_comic(images_path)
         upload_link = get_upload_link(vk_access_token, vk_group_id, vk_user_id)
         photo_hash, photo_photo, photo_server = upload_server_photos(upload_link, comic_path)
-        media_id = saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_id)
-        publish_to_wall(vk_access_token, media_id, vk_group_id)
+        media_id, owner_id = saves_album(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_id)
+        publish_to_wall(vk_access_token, media_id, vk_group_id, owner_id)
     except requests.exceptions.HTTPError:
         print("Ошибка при запросе к ВК")
     finally:
