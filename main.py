@@ -102,4 +102,7 @@ if __name__ == "__main__":
     except requests.exceptions.HTTPError:
         print("Ошибка при запросе к ВК")
     finally:
-        os.remove(comic_path)
+        files_in_dir = os.listdir("images")
+        for filename in files_in_dir:
+            os.remove(os.path.join("images", filename))
+        os.rmdir("images")
