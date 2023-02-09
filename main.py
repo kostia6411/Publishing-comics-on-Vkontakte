@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+import shutil
 
 import requests
 from dotenv import load_dotenv
@@ -20,13 +21,14 @@ def get_upload_link(vk_access_token, vk_group_id, vk_user_id):
     return response.json()["response"]["upload_url"]
 
 
-def publication_comic_wall(vk_access_token, media_id, vk_group_id, owner_id):
+def publishes_comics_wall(vk_access_token, media_id, vk_group_id, owner_id):
     url = "https://api.vk.com/method/wall.post"
     payload = {
         "access_token": vk_access_token,
         "v": '5.131',
         "owner_id": f"-{vk_group_id}",
-        "attachments": f"photo{owner_id}_{media_id}"
+        "attachments": f"photo{owner_id}_{media_id}",
+        'from_group': 1,
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
@@ -98,11 +100,8 @@ if __name__ == "__main__":
         upload_link = get_upload_link(vk_access_token, vk_group_id, vk_user_id)
         photo_hash, photo, photo_server = upload_server_photos(upload_link, comic_path)
         media_id, owner_id = save_comic(vk_access_token, photo_hash, photo, photo_server, vk_group_id)
-        publication_comic_wall(vk_access_token, media_id, vk_group_id, owner_id)
+        publishes_comics_wall(vk_access_token, media_id, vk_group_id, owner_id)
     except requests.exceptions.HTTPError:
         print("Ошибка при запросе к ВК")
     finally:
-        files_in_dir = os.listdir("images")
-        for filename in files_in_dir:
-            os.remove(os.path.join("images", filename))
-        os.rmdir("images")
+        shutil.rmtree("images")
