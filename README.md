@@ -18,9 +18,9 @@ ID пользователя можно получить звйдя на стра
 
 Пример файла .env
 ```
-ACCESS_TOKEN=[Ваш access токен]
-GROUP_ID=[Ваш ID группы]
-USER_ID=[Ваш ID пользователя]
+VK_ACCESS_TOKEN=[Ваш VK access токен]
+VK_GROUP_ID=[Ваш VK ID группы]
+VK_USER_ID=[Ваш VK ID пользователя]
 ```
 
 Python3 должен быть уже установлен. 
