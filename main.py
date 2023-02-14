@@ -48,8 +48,9 @@ def save_comic(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
+    simplified_answer = response.json()
     check_vk_response(response)
-    return response.json()["response"][0]["id"], response.json()["response"][0]["owner_id"]
+    return simplified_answer["response"][0]["id"], response.json()["response"][0]["owner_id"]
 
 
 def upload_server_photos(upload_link, comic_path):
