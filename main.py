@@ -17,7 +17,8 @@ def get_upload_link(vk_access_token, vk_group_id, vk_user_id):
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    check_vk_response(response)
+    response_payload = response.json()
+    check_vk_response(response_payload)
     return response.json()["response"]["upload_url"]
 
 
@@ -32,7 +33,8 @@ def publishes_comics_wall(vk_access_token, media_id, vk_group_id, owner_id):
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    check_vk_response(response)
+    response_payload = response.json()
+    check_vk_response(response_payload)
     return response.json()
 
 
@@ -48,9 +50,9 @@ def save_comic(vk_access_token, photo_hash, photo_photo, photo_server, vk_group_
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    simplified_answer = response.json()
-    check_vk_response(response)
-    return simplified_answer["response"][0]["id"], response.json()["response"][0]["owner_id"]
+    response_payload = response.json()
+    check_vk_response(response_payload)
+    return response_payload["response"][0]["id"], response.json()["response"][0]["owner_id"]
 
 
 def upload_server_photos(upload_link, comic_path):
@@ -60,8 +62,8 @@ def upload_server_photos(upload_link, comic_path):
         }
         response = requests.post(upload_link, files=payload)
     response.raise_for_status()
-    check_vk_response(response)
     response_payload = response.json()
+    check_vk_response(response_payload)
     return response_payload['hash'], response_payload['photo'], response_payload['server']
 
 
@@ -83,8 +85,8 @@ def download_random_comic(images_path):
 
 
 def check_vk_response(response):
-    if response.json().get('error'):
-        logging.warning(response.json())
+    if response.get('error'):
+        logging.warning(response)
         raise requests.exceptions.HTTPError
 
 
